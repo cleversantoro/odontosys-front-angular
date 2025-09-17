@@ -1,0 +1,211 @@
+<div>
+  <app-page-breadcrumb pageTitle="Consulta de Pacientes" />
+
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+    <div class="flex flex-col gap-4">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        <h2 class="text-xl font-extrabold"></h2>
+
+        <div class="flex flex-wrap gap-2">
+          <input type="text" placeholder="Buscar por nome, e-mail, cidade..."
+                 class="w-72 border rounded-xl px-3 py-2"
+                 [value]="search()" (input)="search.set($any($event.target).value); page.set(1)" />
+
+          <button class="px-3 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700"
+                  routerLink="/paciente/novo">
+            + Novo Paciente
+          </button>
+
+          <button class="px-3 py-2 rounded-xl font-semibold bg-gray-100 hover:bg-gray-200"
+                  (click)="exportXLSX()">
+            Exportar Excel (CSV)
+          </button>
+
+          <button class="px-3 py-2 rounded-xl font-semibold bg-gray-100 hover:bg-gray-200"
+                  (click)="exportPDF()">
+            Exportar PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra secundária -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-500">Ordenar por:</span>
+          <button class="px-2 py-1 rounded-lg border"
+                  [class.bg-sky-50]="(sort().field==='nome')"
+                  (click)="setSort('nome')">
+            Nome
+            <span *ngIf="sort().field==='nome'">({{ sort().dir }})</span>
+          </button>
+          <button class="px-2 py-1 rounded-lg border"
+                  [class.bg-sky-50]="(sort().field==='createdAt')"
+                  (click)="setSort('createdAt')">
+            Criado em
+            <span *ngIf="sort().field==='createdAt'">({{ sort().dir }})</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-500">Página</span>
+          <button class="px-2 py-1 rounded-lg border" (click)="prevPage()">«</button>
+          <span class="px-2">{{ page() }} / {{ totalPages() }}</span>
+          <button class="px-2 py-1 rounded-lg border" (click)="nextPage()">»</button>
+
+          <select class="ml-2 border rounded-lg px-2 py-1" [value]="pageSize()" (change)="pageSize.set(+($any($event.target).value)); page.set(1)">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabela -->
+      <div class="overflow-auto rounded-xl border">
+        <table class="min-w-full table-auto text-sm">
+          <thead class="bg-slate-50">
+            <tr class="text-left">
+              <th class="px-3 py-2">ID</th>
+              <th class="px-3 py-2">Nome</th>
+              <th class="px-3 py-2">E-mail</th>
+              <th class="px-3 py-2">Telefone</th>
+              <th class="px-3 py-2">CPF</th>
+              <th class="px-3 py-2">Cidade/UF</th>
+              <th class="px-3 py-2 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading()">
+              <td class="px-3 py-4 text-center text-gray-500" colspan="7">Carregando…</td>
+            </tr>
+            <tr *ngIf="!loading() && error()">
+              <td class="px-3 py-4 text-center text-red-600" colspan="7">{{ error() }}</td>
+            </tr>
+            <tr *ngIf="!loading() && !error() && paged().length===0">
+              <td class="px-3 py-4 text-center text-gray-500" colspan="7">Nenhum registro encontrado.</td>
+            </tr>
+
+            <tr *ngFor="let p of paged()" class="border-t">
+              <td class="px-3 py-2">{{ p.id }}</td>
+              <td class="px-3 py-2 font-semibold">{{ p.nome }}</td>
+              <td class="px-3 py-2">{{ p.contato?.email }}</td>
+              <td class="px-3 py-2">{{ p.contato?.tel1 }}</td>
+              <td class="px-3 py-2">{{ p.cpf }}</td>
+              <td class="px-3 py-2">{{ p.endereco?.cidade }}/{{ p.endereco?.estado }}</td>
+              <td class="px-3 py-2">
+                <div class="flex items-center gap-2 justify-end">
+                  <button class="px-2 py-1 rounded-lg border hover:bg-gray-50" (click)="onView(p)">Ver</button>
+                  <button class="px-2 py-1 rounded-lg border hover:bg-gray-50" (click)="onEdit(p)">Editar</button>
+                  <button class="px-2 py-1 rounded-lg border text-red-700 hover:bg-red-50" (click)="onDelete(p)">Excluir</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- View Modal -->
+      <div *ngIf="viewRow()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold">Paciente: {{ viewRow()?.nome }}</h3>
+            <button class="p-2 rounded-lg hover:bg-gray-100" (click)="closeModals()">✕</button>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3 text-sm">
+            <div><span class="text-gray-500">E-mail:</span> {{ viewRow()?.contato?.email }}</div>
+            <div><span class="text-gray-500">Telefone:</span> {{ viewRow()?.contato?.tel1 }}</div>
+            <div><span class="text-gray-500">CPF:</span> {{ viewRow()?.cpf }}</div>
+            <div><span class="text-gray-500">Nascimento:</span> {{ viewRow()?.nascimento | date:'dd/MM/yyyy' }}</div>
+            <div class="sm:col-span-2"><span class="text-gray-500">Endereço:</span>
+              {{ viewRow()?.endereco?.logradouro }}, {{ viewRow()?.endereco?.numero }} —
+              {{ viewRow()?.endereco?.bairro }} — {{ viewRow()?.endereco?.cidade }}/{{ viewRow()?.endereco?.estado }}
+              (CEP {{ viewRow()?.endereco?.cep }})
+            </div>
+          </div>
+          <div class="mt-5 flex justify-end gap-2">
+            <button class="px-3 py-2 rounded-lg border hover:bg-gray-50" (click)="closeModals()">Fechar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Modal -->
+      <div *ngIf="editRow()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold">Editar: {{ editRow()?.nome }}</h3>
+            <button class="p-2 rounded-lg hover:bg-gray-100" (click)="closeModals()">✕</button>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="saveEdit()" class="grid sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="font-semibold">Nome *</label>
+              <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="nome">
+            </div>
+            <div>
+              <label class="font-semibold">E-mail</label>
+              <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="email">
+            </div>
+            <div>
+              <label class="font-semibold">Telefone</label>
+              <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="tel1">
+            </div>
+            <div>
+              <label class="font-semibold">Telefone 2</label>
+              <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="tel2">
+            </div>
+            <div>
+              <label class="font-semibold">CPF</label>
+              <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="cpf" placeholder="000.000.000-00">
+            </div>
+
+            <div class="sm:col-span-2 grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="font-semibold">Logradouro</label>
+                <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="logradouro">
+              </div>
+              <div>
+                <label class="font-semibold">Número</label>
+                <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="numero">
+              </div>
+              <div>
+                <label class="font-semibold">Bairro</label>
+                <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="bairro">
+              </div>
+              <div>
+                <label class="font-semibold">Cidade</label>
+                <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="cidade">
+              </div>
+              <div>
+                <label class="font-semibold">Estado</label>
+                <input class="mt-1 w-full border rounded-xl px-3 py-2" formControlName="estado">
+              </div>
+            </div>
+
+            <div class="sm:col-span-2 mt-2 flex justify-end gap-2">
+              <button type="button" class="px-3 py-2 rounded-lg border hover:bg-gray-50" (click)="closeModals()">Cancelar</button>
+              <button type="submit" class="px-3 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Delete Modal -->
+      <div *ngIf="deleteRow()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold">Excluir paciente</h3>
+            <button class="p-2 rounded-lg hover:bg-gray-100" (click)="closeModals()">✕</button>
+          </div>
+          <p class="text-sm">Tem certeza que deseja excluir <strong>{{ deleteRow()?.nome }}</strong>?</p>
+          <div class="mt-5 flex justify-end gap-2">
+            <button class="px-3 py-2 rounded-lg border hover:bg-gray-50" (click)="closeModals()">Cancelar</button>
+            <button class="px-3 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700" (click)="confirmDelete()">Excluir</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
