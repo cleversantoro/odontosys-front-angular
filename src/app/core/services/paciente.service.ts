@@ -1,54 +1,38 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Paciente } from '../models/paciente.model';
 
-export interface Paciente {
-  id: number;
-  nome: string;
-  nascimento?: string;
-  cpf?: string;
-  rg?: string;
-  genero?: string;
-  estadoCivil?: string;
-  profissao?: string;
-  contato?: { tel1?: string; tel2?: string; email?: string };
-  endereco?: { cep?: string; numero?: string; logradouro?: string; complemento?: string; bairro?: string; cidade?: string; estado?: string };
-  emergencia?: { contato?: string; telefone?: string; parentesco?: string };
-  anamnese?: any;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-const API_URL = 'http://localhost:5000/api/pacientes'; // ajuste se necessário
+const API_URL = `${environment.apiUrl}/api/pacientes`;
 
 @Injectable({ providedIn: 'root' })
 export class PacientesService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  list(query?: { search?: string; page?: number; pageSize?: number; sort?: string; dir?: 'asc'|'desc' }) {
-    // Se sua API tem paginação server-side, use params reais aqui.
+  list(query?: { search?: string; page?: number; pageSize?: number; sort?: string; dir?: 'asc' | 'desc' }): Observable<Paciente[]> {
     let params = new HttpParams();
     if (query?.search) params = params.set('q', query.search);
     if (query?.page) params = params.set('page', query.page);
     if (query?.pageSize) params = params.set('pageSize', query.pageSize);
     if (query?.sort) params = params.set('sort', query.sort);
     if (query?.dir) params = params.set('dir', query.dir);
-    return firstValueFrom(this.http.get<Paciente[]>(API_URL, { params }));
+    return this.http.get<Paciente[]>(API_URL, { params });
   }
 
-  getById(id: number) {
-    return firstValueFrom(this.http.get<Paciente>(`${API_URL}/${id}`));
+  getById(id: number): Observable<Paciente> {
+    return this.http.get<Paciente>(`${API_URL}/${id}`);
   }
 
-  create(payload: Partial<Paciente>) {
-    return firstValueFrom(this.http.post(API_URL, payload));
+  create(payload: Partial<Paciente>): Observable<Paciente> {
+    return this.http.post<Paciente>(API_URL, payload);
   }
 
-  update(id: number, payload: Partial<Paciente>) {
-    return firstValueFrom(this.http.put(`${API_URL}/${id}`, payload));
+  update(id: number, payload: Partial<Paciente>): Observable<Paciente> {
+    return this.http.put<Paciente>(`${API_URL}/${id}`, payload);
   }
 
-  remove(id: number) {
-    return firstValueFrom(this.http.delete(`${API_URL}/${id}`));
+  remove(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/${id}`);
   }
 }

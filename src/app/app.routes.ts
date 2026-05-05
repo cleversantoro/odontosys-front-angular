@@ -18,16 +18,23 @@ import { VideosComponent } from './pages/ui-elements/videos/videos.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { CalenderComponent } from './pages/calender/calender.component';
+
 import { ConsultaComponent } from './pages/consulta/consulta.component';
-import { PacienteComponent } from './pages/paciente/pacientes-add/paciente.component';
-import { ProfissionalComponent } from './pages/profissional/profissional.component';
+
+import { PacientesAddComponent } from './pages/paciente/pacientes-add/pacientes-add.component';
 import { PacientesListComponent } from './pages/paciente/pacientes-list/pacientes-list.component';
+import { PacientesDetailComponent } from './pages/paciente/pacientes-detail/pacientes-detail.component';
+
+import { ProfissionalAddComponent } from './pages/profissional/profissional-add/profissional-add.component';
+import { ProfissionalListComponent } from './pages/profissional/profissional-list/profissional-list.component';
+import { ProfissionalDetailComponent } from './pages/profissional/profissional-detail/profissional-detail.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: AppLayoutComponent,
     children: [
+      //Consulta
       {
         path: 'consulta',
         component: ConsultaComponent,
@@ -35,9 +42,10 @@ export const routes: Routes = [
         title:
           'Consultas | OdontoSys - Consulta de Clientes',
       },
+      //Paciente
       {
         path: 'paciente/novo',
-        component: PacienteComponent,
+        component: PacientesAddComponent,
         pathMatch: 'full',
         title:
           'Pacientes Cadastro| OdontoSys - Cadastro de Pacientes',
@@ -50,23 +58,49 @@ export const routes: Routes = [
           'Pacientes Lista| OdontoSys - Consulta de Pacientes',
       },
       {
-        path: 'profissional',
-        component: ProfissionalComponent,
+        path: 'paciente/detalhe',
+        component: PacientesDetailComponent,
+        pathMatch: 'full',
+        title:
+          'Profissionais | OdontoSys - Paciente',
+      },
+      //Profissional
+      {
+        path: 'profissional/novo',
+        component: ProfissionalAddComponent,
         pathMatch: 'full',
         title:
           'Profissionais | OdontoSys - Consulta de Profissionais',
       },
+      {
+        path: 'profissional/lista',
+        component: ProfissionalListComponent,
+        pathMatch: 'full',
+        title:
+          'Profissionais | OdontoSys - Cadastro de Profissional',
+      },
+      {
+        path: 'profissional/detalhe',
+        component: ProfissionalDetailComponent,
+        pathMatch: 'full',
+        title:
+          'Profissionais | OdontoSys - Profissional',
+      },
+      //Agendamento
+      {
+        path: 'agendamento',
+        component: CalenderComponent,
+        title: 'Agendamentos | OdontoSys - Agendamentos de pacientes'
+      },
+
+
+      
       {
         path: '',
         component: EcommerceComponent,
         pathMatch: 'full',
         title:
           'Angular Ecommerce Dashboard | OdontoSys - Angular Admin Dashboard Template',
-      },
-      {
-        path: 'agendamento',
-        component: CalenderComponent,
-        title: 'Agendamentos | OdontoSys - Agendamentos de pacientes'
       },
       {
         path: 'profile',
@@ -88,6 +122,7 @@ export const routes: Routes = [
         component: BlankComponent,
         title: 'Angular Blank Dashboard | TailAdmin - Angular Admin Dashboard Template'
       },
+
       // support tickets
       {
         path: 'invoice',

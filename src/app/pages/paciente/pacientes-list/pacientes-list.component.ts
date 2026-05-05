@@ -1,9 +1,11 @@
-import { Component, computed, signal, effect } from '@angular/core';
+import { Component, computed, signal, effect, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PacientesService, Paciente } from '../../../core/services/paciente.service';
+import { PacientesService } from '../../../core/services/paciente.service';
+import { Paciente } from '../../../core/models/paciente.model';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 // XLSX
 import * as XLSX from 'xlsx';
@@ -77,6 +79,7 @@ export class PacientesListComponent {
   });
 
   form!: FormGroup;
+  private sub?: Subscription;
 
   constructor(
     private service: PacientesService,
@@ -91,8 +94,8 @@ export class PacientesListComponent {
   }
 
   // Form de edição (popup)
-  async ngOnInit() {
-    this.fb.group({
+  ngOnInit() {
+    this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.email]],
       tel1: [''],
@@ -105,17 +108,23 @@ export class PacientesListComponent {
       estado: [''],
     });
 
-    try {
-      this.loading.set(true);
-      this.error.set(null);
-      const data = await this.service.list();
-      this.rows.set(data);
-    } catch (e) {
-      this.error.set('Falha ao carregar pacientes.');
-    } finally {
-      this.loading.set(false);
-    }
-}
+    this.loading.set(true);
+    this.error.set(null);
+    this.sub = this.service.list().subscribe({
+      next: (data) => {
+        this.rows.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Falha ao carregar pacientes.');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
+  }
 
 prevPage() {
   this.page.set(Math.max(1, this.page() - 1));
@@ -160,7 +169,7 @@ closeModals() {
 
   async saveEdit() {
   const row = this.editRow();
-  if (!row) return;
+  if (!row?.id) return;
   if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
   const v = this.form.value;
@@ -183,8 +192,7 @@ closeModals() {
   };
 
   try {
-    await this.service.update(row.id, payload);
-    // Atualiza na grid local
+    await firstValueFrom(this.service.update(row.id, payload));
     this.rows.set(this.rows().map(r => r.id === row.id ? ({ ...r, ...payload, contato: { ...r.contato, ...payload.contato }, endereco: { ...r.endereco, ...payload.endereco } }) : r));
     this.closeModals();
   } catch {
@@ -194,9 +202,9 @@ closeModals() {
 
   async confirmDelete() {
   const row = this.deleteRow();
-  if (!row) return;
+  if (!row?.id) return;
   try {
-    await this.service.remove(row.id);
+    await firstValueFrom(this.service.remove(row.id));
     this.rows.set(this.rows().filter(r => r.id !== row.id));
     this.closeModals();
   } catch {

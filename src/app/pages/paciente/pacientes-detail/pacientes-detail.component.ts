@@ -1,24 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
-  selector: 'app-paciente',
+  selector: 'app-pacientes-detail',
   imports: [CommonModule, PageBreadcrumbComponent, ReactiveFormsModule],
-  templateUrl: './paciente.component.html',
-  styleUrls: ['./paciente.component.css']
+  templateUrl: './pacientes-detail.component.html',
+  styleUrls: ['./pacientes-detail.component.css']
 })
-export class PacienteComponent {
+export class PacientesDetailComponent {
   form: FormGroup;
   toastMsg: string | null = null;
   ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 
-  private API_URL = 'http://localhost:5000/api/pacientes'; // ajuste para seu backend C#
+  private API_URL = `${environment.apiUrl}/api/pacientes`;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
