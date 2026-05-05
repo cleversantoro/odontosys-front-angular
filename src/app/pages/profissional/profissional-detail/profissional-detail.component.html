@@ -1,15 +1,41 @@
 <div>
-  <app-page-breadcrumb pageTitle="Profissional" />
-  <div class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-    <div class="mx-auto w-full max-w-[630px] text-center">
-      <h3 class="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-        Profissionais
-      </h3>
+  <app-page-breadcrumb pageTitle="Detalhe do Profissional" />
 
-      <p class="text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-        Start putting content on grids or panels, you can also use different
-        combinations of grids.Please check out the dashboard and other pages
-      </p>
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+
+    <div *ngIf="loading()" class="text-center py-10 text-gray-500">Carregando…</div>
+
+    <div *ngIf="error()" class="text-center py-10 text-red-600">{{ error() }}</div>
+
+    <div *ngIf="!loading() && !error() && profissional()">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-extrabold">{{ profissional()?.nome }}</h2>
+        <a routerLink="/profissional/lista"
+           class="px-3 py-2 rounded-xl border hover:bg-gray-50 text-sm">
+          ← Voltar à lista
+        </a>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-gray-500 font-medium">E-mail:</span>
+          <p>{{ profissional()?.email }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500 font-medium">CRO:</span>
+          <p>{{ profissional()?.cro ?? '—' }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500 font-medium">Status:</span>
+          <p>{{ profissional()?.status ?? 'ativo' }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500 font-medium">Especialidades:</span>
+          <p>{{ profissional()?.Especialidades?.length ? profissional()?.Especialidades?.join(', ') : '—' }}</p>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
+

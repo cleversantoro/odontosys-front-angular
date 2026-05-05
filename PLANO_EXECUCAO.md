@@ -42,28 +42,28 @@
 > Antes de implementar os serviços, os models precisam estar corretos.
 
 ### 2.1 Completar model `Profissional`
-- [ ] Adicionar campos: `cro`, `especialidade`, `departamentos`, `status` (ativo/inativo), `telefone`
+- [x] Adicionar campos: `cro`, `especialidade`, `departamentos`, `status` (ativo/inativo), `telefone`
 - **Arquivo:** `src/app/core/models/profissional.model.ts`
 
 ### 2.2 Completar model `Agendamento`
-- [ ] Adicionar campos: `duracao`, `tipoProcedimento`, `sala`, `titulo`, `cor`
+- [x] Adicionar campos: `duracao`, `tipoProcedimento`, `sala`, `titulo`, `cor`
 - **Arquivo:** `src/app/core/models/agendamento.model.ts`
 
 ### 2.3 Completar model `Consulta`
-- [ ] Adicionar campos: `procedimentos`, `valorCobrado`, `observacoes`, `dataConclusao`
+- [x] Adicionar campos: `procedimentos`, `valorCobrado`, `observacoes`, `dataConclusao`
 - **Arquivo:** `src/app/core/models/consulta.model.ts`
 
 ### 2.4 Criar model `Orcamento`
-- [ ] Criar arquivo `src/app/core/models/orcamento.model.ts`
-- [ ] Definir campos: `id`, `pacienteId`, `profissionalId`, `itens[]`, `valorTotal`, `status`, `validade`, `createdAt`
+- [x] Criar arquivo `src/app/core/models/orcamento.model.ts`
+- [x] Definir campos: `id`, `pacienteId`, `profissionalId`, `itens[]`, `valorTotal`, `status`, `validade`, `createdAt`
 
 ### 2.5 Criar model `Financeiro`
-- [ ] Criar arquivo `src/app/core/models/financeiro.model.ts`
-- [ ] Definir campos: `id`, `tipo` (receita/despesa), `descricao`, `valor`, `data`, `categoria`, `status`
+- [x] Criar arquivo `src/app/core/models/financeiro.model.ts`
+- [x] Definir campos: `id`, `tipo` (receita/despesa), `descricao`, `valor`, `data`, `categoria`, `status`
 
 ### 2.6 Criar model `Usuario`
-- [ ] Criar arquivo `src/app/core/models/usuario.model.ts`
-- [ ] Definir campos: `id`, `nome`, `email`, `perfil`, `ativo`, `createdAt`
+- [x] Criar arquivo `src/app/core/models/usuario.model.ts`
+- [x] Definir campos: `id`, `nome`, `email`, `perfil`, `ativo`, `createdAt`
 
 ---
 
@@ -71,40 +71,40 @@
 > Nenhuma rota está protegida. Esta fase é obrigatória antes de qualquer deploy.
 
 ### 3.1 Criar `AuthService`
-- [ ] Criar `src/app/core/services/auth.service.ts`
-- [ ] Implementar método `login(email, senha)` — chamar `POST /api/auth/login`
-- [ ] Implementar armazenamento de JWT no `localStorage` ou `sessionStorage`
-- [ ] Implementar método `logout()` — limpar token e redirecionar para `/sign-in`
-- [ ] Implementar `isLoggedIn()` — verificar se token existe e não está expirado
-- [ ] Implementar `getToken()` — retornar token atual
-- [ ] Implementar `getUsuarioAtual()` — retornar dados do usuário logado (decode do JWT)
+- [x] Criar `src/app/core/services/auth.service.ts`
+- [x] Implementar método `login(email, senha)` — chamar `POST /api/auth/login`
+- [x] Implementar armazenamento de JWT no `localStorage` ou `sessionStorage`
+- [x] Implementar método `logout()` — limpar token e redirecionar para `/sign-in`
+- [x] Implementar `isLoggedIn()` — verificar se token existe e não está expirado
+- [x] Implementar `getToken()` — retornar token atual
+- [x] Implementar `getUsuarioAtual()` — retornar dados do usuário logado (decode do JWT)
 
 ### 3.2 Criar `AuthGuard`
-- [ ] Criar `src/app/core/guards/auth.guard.ts`
-- [ ] Implementar `CanActivateFn` que verifica `AuthService.isLoggedIn()`
-- [ ] Redirecionar para `/sign-in` caso não autenticado
+- [x] Criar `src/app/core/guards/auth.guard.ts`
+- [x] Implementar `CanActivateFn` que verifica `AuthService.isLoggedIn()`
+- [x] Redirecionar para `/sign-in` caso não autenticado
 
 ### 3.3 Criar HTTP Interceptor de autenticação
-- [ ] Criar `src/app/core/interceptors/auth.interceptor.ts`
-- [ ] Adicionar header `Authorization: Bearer <token>` em todas as requisições
-- [ ] Tratar resposta 401: chamar `AuthService.logout()` automaticamente
-- [ ] Registrar o interceptor no `app.config.ts`
+- [x] Criar `src/app/core/interceptors/auth.interceptor.ts`
+- [x] Adicionar header `Authorization: Bearer <token>` em todas as requisições
+- [x] Tratar resposta 401: chamar `AuthService.logout()` automaticamente
+- [x] Registrar o interceptor no `app.config.ts`
 
 ### 3.4 Conectar formulário de login à API
-- [ ] Implementar `onSignIn()` no `SigninFormComponent` chamando `AuthService.login()`
-- [ ] Exibir mensagem de erro em caso de credenciais inválidas
-- [ ] Redirecionar para `/` (dashboard) após login bem-sucedido
+- [x] Implementar `onSignIn()` no `SigninFormComponent` chamando `AuthService.login()`
+- [x] Exibir mensagem de erro em caso de credenciais inválidas
+- [x] Redirecionar para `/` (dashboard) após login bem-sucedido
 - **Arquivo:** `src/app/shared/components/auth/signin-form/signin-form.component.ts`
 
 ### 3.5 Proteger todas as rotas com `AuthGuard`
-- [ ] Adicionar `canActivate: [authGuard]` no componente `AppLayoutComponent` no `app.routes.ts`
-- [ ] Verificar que rotas de autenticação (`/sign-in`, `/sign-up`) ficam fora do guard
+- [x] Adicionar `canActivate: [authGuard]` no componente `AppLayoutComponent` no `app.routes.ts`
+- [x] Verificar que rotas de autenticação (`/sign-in`, `/sign-up`) ficam fora do guard
 - **Arquivo:** `src/app/app.routes.ts`
 
 ### 3.6 Conectar formulário de cadastro (`sign-up`) à API
-- [ ] Implementar lógica de criação de usuário no `SignupFormComponent`
-- [ ] Chamar `POST /api/auth/registro` ou equivalente
-- [ ] Redirecionar para `/sign-in` após cadastro
+- [x] Implementar lógica de criação de usuário no `SignupFormComponent`
+- [x] Chamar `POST /api/auth/register` (endpoint real da API)
+- [x] Redirecionar para `/sign-in` após cadastro
 
 ---
 
@@ -112,21 +112,21 @@
 > Corrigir rotas quebradas que impedem navegação correta.
 
 ### 4.1 Corrigir rota de detalhe do Paciente
-- [ ] Alterar rota de `paciente/detalhe` para `paciente/detalhe/:id` no `app.routes.ts`
-- [ ] Atualizar links de navegação na lista de pacientes para passar o ID
+- [x] Alterar rota de `paciente/detalhe` para `paciente/detalhe/:id` no `app.routes.ts`
+- [x] Atualizar links de navegação na lista de pacientes para passar o ID
 - **Arquivo:** `src/app/app.routes.ts`
 
 ### 4.2 Corrigir rota de detalhe do Profissional
-- [ ] Alterar rota de `profissional/detalhe` para `profissional/detalhe/:id`
-- [ ] Atualizar links de navegação na lista de profissionais
+- [x] Alterar rota de `profissional/detalhe` para `profissional/detalhe/:id`
+- [x] Atualizar links de navegação na lista de profissionais
 - **Arquivo:** `src/app/app.routes.ts`
 
 ### 4.3 Adicionar Tratamento de Erro HTTP Global
-- [ ] Criar `src/app/core/interceptors/error.interceptor.ts`
-- [ ] Tratar 401: redirecionar para login
-- [ ] Tratar 403: exibir mensagem de acesso negado
-- [ ] Tratar 500: exibir mensagem genérica de erro
-- [ ] Registrar no `app.config.ts`
+- [x] Criar `src/app/core/interceptors/error.interceptor.ts`
+- [x] Tratar 401: redirecionar para login (via `authInterceptor` existente)
+- [x] Tratar 403: exibir mensagem de acesso negado (via `ToastService`)
+- [x] Tratar 500/502/503: exibir mensagem genérica de erro
+- [x] Registrar no `app.config.ts`
 
 ---
 

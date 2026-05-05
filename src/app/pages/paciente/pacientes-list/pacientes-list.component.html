@@ -96,6 +96,7 @@
               <td class="px-3 py-2">{{ p.endereco?.cidade }}/{{ p.endereco?.estado }}</td>
               <td class="px-3 py-2">
                 <div class="flex items-center gap-2 justify-end">
+                  <a class="px-2 py-1 rounded-lg border hover:bg-gray-50" [routerLink]="['/paciente/detalhe', p.id]">Detalhe</a>
                   <button class="px-2 py-1 rounded-lg border hover:bg-gray-50" (click)="onView(p)">Ver</button>
                   <button class="px-2 py-1 rounded-lg border hover:bg-gray-50" (click)="onEdit(p)">Editar</button>
                   <button class="px-2 py-1 rounded-lg border text-red-700 hover:bg-red-50" (click)="onDelete(p)">Excluir</button>

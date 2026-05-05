@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 import { EcommerceComponent } from './pages/dashboard/ecommerce/ecommerce.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FormElementsComponent } from './pages/forms/form-elements/form-elements.component';
@@ -33,6 +34,7 @@ export const routes: Routes = [
   {
     path: '',
     component: AppLayoutComponent,
+    canActivate: [authGuard],
     children: [
       //Consulta
       {
@@ -58,11 +60,11 @@ export const routes: Routes = [
           'Pacientes Lista| OdontoSys - Consulta de Pacientes',
       },
       {
-        path: 'paciente/detalhe',
+        path: 'paciente/detalhe/:id',
         component: PacientesDetailComponent,
         pathMatch: 'full',
         title:
-          'Profissionais | OdontoSys - Paciente',
+          'Paciente Detalhe | OdontoSys - Paciente',
       },
       //Profissional
       {
@@ -80,11 +82,11 @@ export const routes: Routes = [
           'Profissionais | OdontoSys - Cadastro de Profissional',
       },
       {
-        path: 'profissional/detalhe',
+        path: 'profissional/detalhe/:id',
         component: ProfissionalDetailComponent,
         pathMatch: 'full',
         title:
-          'Profissionais | OdontoSys - Profissional',
+          'Profissional Detalhe | OdontoSys - Profissional',
       },
       //Agendamento
       {
@@ -171,16 +173,16 @@ export const routes: Routes = [
       },
     ]
   },
-  // auth pages
+  // auth pages (fora do AuthGuard)
   {
-    path: 'signin',
+    path: 'sign-in',
     component: SignInComponent,
-    title: 'Angular Sign In Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    title: 'Entrar | OdontoSys'
   },
   {
-    path: 'signup',
+    path: 'sign-up',
     component: SignUpComponent,
-    title: 'Angular Sign Up Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    title: 'Criar conta | OdontoSys'
   },
   // error pages
   {

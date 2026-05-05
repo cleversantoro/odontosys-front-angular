@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
 import { environment } from '../../../../environments/environment';
+import { PacientesService } from '../../../core/services/paciente.service';
 
 
 @Component({
@@ -13,14 +15,24 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './pacientes-detail.component.html',
   styleUrls: ['./pacientes-detail.component.css']
 })
-export class PacientesDetailComponent {
+export class PacientesDetailComponent implements OnInit {
   form: FormGroup;
   toastMsg: string | null = null;
   ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 
+  pacienteId: number | null = null;
+  isEditing = false;
+  loadingPaciente = false;
+
   private API_URL = `${environment.apiUrl}/api/pacientes`;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private pacientesService: PacientesService
+  ) {
     this.form = this.fb.group({
       // Dados pessoais
       nome: ['', [Validators.required, Validators.minLength(3)]],
@@ -77,6 +89,48 @@ export class PacientesDetailComponent {
     this.form.get('medicacao')!.valueChanges.subscribe(v => v === 'nao' && this.form.get('medicacaoQuais')!.setValue(''));
   }
 
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.pacienteId = Number(idParam);
+      this.isEditing = true;
+      this.loadPaciente(this.pacienteId);
+    }
+  }
+
+  private loadPaciente(id: number): void {
+    this.loadingPaciente = true;
+    this.pacientesService.getById(id).subscribe({
+      next: (p) => {
+        this.loadingPaciente = false;
+        this.form.patchValue({
+          nome:         p.nome ?? '',
+          nascimento:   p.dataNascimento ?? '',
+          cpf:          p.cpf ?? '',
+          //rg:           p.rg ?? '',
+          //genero:       p.genero ?? '',
+          estadoCivil:  p.estadoCivil ?? '',
+          //profissao:    p.profissao ?? '',
+          // Contato
+          tel1:         p.contato?.tel1 ?? '',
+          tel2:         p.contato?.tel2 ?? '',
+          email:        p.contato?.email ?? '',
+          // Endereço
+          cep:          p.endereco?.cep ?? '',
+          numero:       p.endereco?.numero ?? '',
+          logradouro:   p.endereco?.logradouro ?? '',
+          complemento:  p.endereco?.complemento ?? '',
+          bairro:       p.endereco?.bairro ?? '',
+          cidade:       p.endereco?.cidade ?? '',
+          estado:       p.endereco?.estado ?? '',
+        });
+      },
+      error: () => {
+        this.loadingPaciente = false;
+        this.showToast('❌ Paciente não encontrado.');
+      }
+    });
+  }
 
   // No topo da classe:
   tabs = [
@@ -274,10 +328,14 @@ export class PacientesDetailComponent {
     };
 
     try {
-      await this.http.post(this.API_URL, payload).toPromise();
-      this.showToast('✅ Paciente cadastrado com sucesso!');
+      if (this.isEditing && this.pacienteId) {
+        await this.http.put(`${this.API_URL}/${this.pacienteId}`, payload).toPromise();
+        this.showToast('✅ Paciente atualizado com sucesso!');
+      } else {
+        await this.http.post(this.API_URL, payload).toPromise();
+        this.showToast('✅ Paciente cadastrado com sucesso!');
+      }
       this.submitted = false;
-      // this.form.reset({ alergia:'nao', cronica:'nao', medicacao:'nao', fumante:'nao', sangramento:'nao', diabetico:'nao', cardiaco:'nao', gravida:'nao' });
     } catch {
       this.showToast('❌ Erro ao salvar. Tente novamente.');
     }
