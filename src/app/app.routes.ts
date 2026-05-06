@@ -30,6 +30,17 @@ import { ProfissionalAddComponent } from './pages/profissional/profissional-add/
 import { ProfissionalListComponent } from './pages/profissional/profissional-list/profissional-list.component';
 import { ProfissionalDetailComponent } from './pages/profissional/profissional-detail/profissional-detail.component';
 
+import { ConveniosListComponent } from './pages/convenios/convenios-list/convenios-list.component';
+
+import { OrcamentoListComponent } from './pages/orcamento/orcamento-list/orcamento-list.component';
+import { OrcamentoAddComponent } from './pages/orcamento/orcamento-add/orcamento-add.component';
+import { OrcamentoDetailComponent } from './pages/orcamento/orcamento-detail/orcamento-detail.component';
+
+import { FinanceiroListComponent } from './pages/financeiro/financeiro-list/financeiro-list.component';
+
+import { UsuariosListComponent } from './pages/usuarios/usuarios-list/usuarios-list.component';
+import { RelatoriosComponent } from './pages/relatorios/relatorios.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -93,6 +104,53 @@ export const routes: Routes = [
         path: 'agendamento',
         component: CalenderComponent,
         title: 'Agendamentos | OdontoSys - Agendamentos de pacientes'
+      },
+      //Convênios
+      {
+        path: 'convenios/lista',
+        component: ConveniosListComponent,
+        pathMatch: 'full',
+        title: 'Convênios | OdontoSys',
+      },
+      //Orçamento
+      {
+        path: 'orcamento/lista',
+        component: OrcamentoListComponent,
+        pathMatch: 'full',
+        title: 'Orçamentos | OdontoSys',
+      },
+      {
+        path: 'orcamento/novo',
+        component: OrcamentoAddComponent,
+        pathMatch: 'full',
+        title: 'Novo Orçamento | OdontoSys',
+      },
+      {
+        path: 'orcamento/detalhe/:id',
+        component: OrcamentoDetailComponent,
+        pathMatch: 'full',
+        title: 'Orçamento | OdontoSys',
+      },
+      //Financeiro
+      {
+        path: 'financeiro',
+        component: FinanceiroListComponent,
+        pathMatch: 'full',
+        title: 'Financeiro | OdontoSys',
+      },
+      //Usuários
+      {
+        path: 'usuarios',
+        component: UsuariosListComponent,
+        pathMatch: 'full',
+        title: 'Usuários | OdontoSys',
+      },
+      //Relatórios
+      {
+        path: 'relatorios',
+        component: RelatoriosComponent,
+        pathMatch: 'full',
+        title: 'Relatórios | OdontoSys',
       },
 
 

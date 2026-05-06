@@ -7,35 +7,105 @@
 
     <div *ngIf="error()" class="text-center py-10 text-red-600">{{ error() }}</div>
 
-    <div *ngIf="!loading() && !error() && profissional()">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-extrabold">{{ profissional()?.nome }}</h2>
-        <a routerLink="/profissional/lista"
-           class="px-3 py-2 rounded-xl border hover:bg-gray-50 text-sm">
-          ← Voltar à lista
-        </a>
+    <div *ngIf="!loading() && !error()">
+      <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-xl font-extrabold">Editar Profissional</h2>
+        <div class="flex gap-2">
+          <button (click)="showDeleteModal.set(true)"
+                  class="px-3 py-2 rounded-xl border border-red-200 text-red-600 text-sm hover:bg-red-50">
+            Excluir
+          </button>
+          <a routerLink="/profissional/lista"
+             class="px-3 py-2 rounded-xl border text-sm hover:bg-gray-50">
+            ← Voltar
+          </a>
+        </div>
       </div>
 
-      <div class="grid sm:grid-cols-2 gap-4 text-sm">
-        <div>
-          <span class="text-gray-500 font-medium">E-mail:</span>
-          <p>{{ profissional()?.email }}</p>
+      <p class="text-sm text-gray-500 mb-6">
+        Campos com <span class="text-red-600 font-semibold">*</span> são obrigatórios.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="onUpdate()" class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+
+        <!-- Nome -->
+        <div class="sm:col-span-2">
+          <label class="font-semibold">Nome Completo <span class="text-red-600">*</span></label>
+          <input type="text" formControlName="nome"
+                 class="mt-1 w-full border rounded-xl px-3 py-2">
+          <p class="text-sm text-red-600 mt-1" *ngIf="invalid('nome')">
+            Informe o nome completo (mínimo 3 caracteres).
+          </p>
         </div>
+
+        <!-- E-mail -->
         <div>
-          <span class="text-gray-500 font-medium">CRO:</span>
-          <p>{{ profissional()?.cro ?? '—' }}</p>
+          <label class="font-semibold">E-mail <span class="text-red-600">*</span></label>
+          <input type="email" formControlName="email"
+                 class="mt-1 w-full border rounded-xl px-3 py-2">
+          <p class="text-sm text-red-600 mt-1" *ngIf="invalid('email')">
+            Informe um e-mail válido.
+          </p>
         </div>
+
+        <!-- Data de Nascimento -->
         <div>
-          <span class="text-gray-500 font-medium">Status:</span>
-          <p>{{ profissional()?.status ?? 'ativo' }}</p>
+          <label class="font-semibold">Data de Nascimento <span class="text-red-600">*</span></label>
+          <input type="date" formControlName="dataNascimento"
+                 class="mt-1 w-full border rounded-xl px-3 py-2">
+          <p class="text-sm text-red-600 mt-1" *ngIf="invalid('dataNascimento')">
+            Informe a data de nascimento.
+          </p>
         </div>
+
+        <!-- Sexo -->
         <div>
-          <span class="text-gray-500 font-medium">Especialidades:</span>
-          <p>{{ profissional()?.Especialidades?.length ? profissional()?.Especialidades?.join(', ') : '—' }}</p>
+          <label class="font-semibold">Sexo <span class="text-red-600">*</span></label>
+          <select formControlName="sexo" class="mt-1 w-full border rounded-xl px-3 py-2">
+            <option value="">Selecione…</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+          </select>
+          <p class="text-sm text-red-600 mt-1" *ngIf="invalid('sexo')">
+            Selecione o sexo.
+          </p>
         </div>
-      </div>
+
+        <!-- Botões -->
+        <div class="sm:col-span-2 flex gap-3 justify-end pt-2">
+          <a routerLink="/profissional/lista"
+             class="px-5 py-2 rounded-xl border text-sm hover:bg-gray-50">
+            Cancelar
+          </a>
+          <button type="submit" [disabled]="saving()"
+                  class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700 disabled:opacity-50">
+            {{ saving() ? 'Salvando…' : 'Salvar Alterações' }}
+          </button>
+        </div>
+
+      </form>
     </div>
+  </div>
+</div>
 
+<!-- Modal de confirmação de exclusão -->
+<div *ngIf="showDeleteModal()"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <h3 class="text-lg font-bold mb-2">Confirmar exclusão</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      Deseja excluir este profissional? Esta ação não pode ser desfeita.
+    </p>
+    <div class="flex gap-3 justify-end">
+      <button (click)="showDeleteModal.set(false)"
+              class="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="doDelete()" [disabled]="deleting()"
+              class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-50">
+        {{ deleting() ? 'Excluindo…' : 'Excluir' }}
+      </button>
+    </div>
   </div>
 </div>
 

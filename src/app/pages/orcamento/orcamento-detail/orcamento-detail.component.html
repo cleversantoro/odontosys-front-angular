@@ -1,0 +1,99 @@
+<div>
+  <app-page-breadcrumb pageTitle="Detalhes do Orçamento" />
+
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+
+    <!-- Loading -->
+    <p *ngIf="loading()" class="text-center text-gray-500 py-12">Carregando…</p>
+    <p *ngIf="error()" class="text-center text-red-600 py-12">{{ error() }}</p>
+
+    <ng-container *ngIf="!loading() && !error() && orcamento() as o">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">Orçamento #{{ o.id }}</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Criado em {{ o.createdAt | date:'dd/MM/yyyy' }}</p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-sm font-semibold" [ngClass]="statusClass(o.status)">
+          {{ o.status }}
+        </span>
+      </div>
+
+      <!-- Info -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div class="rounded-xl border p-4">
+          <p class="text-xs text-gray-500 mb-0.5">Paciente</p>
+          <p class="font-semibold">{{ o.Paciente?.nome || o.pacienteId }}</p>
+        </div>
+        <div class="rounded-xl border p-4">
+          <p class="text-xs text-gray-500 mb-0.5">Profissional</p>
+          <p class="font-semibold">{{ o.Profissional?.nome || o.profissionalId }}</p>
+        </div>
+        <div class="rounded-xl border p-4">
+          <p class="text-xs text-gray-500 mb-0.5">Validade</p>
+          <p class="font-semibold">{{ o.validade || '—' }}</p>
+        </div>
+      </div>
+
+      <!-- Itens -->
+      <h3 class="text-base font-semibold text-gray-700 mb-3">Itens</h3>
+      <div class="overflow-auto rounded-xl border mb-6">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-50">
+            <tr class="text-left">
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">Descrição</th>
+              <th class="px-4 py-3">Dente</th>
+              <th class="px-4 py-3">Qtd.</th>
+              <th class="px-4 py-3">Valor Unit.</th>
+              <th class="px-4 py-3">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of o.itens; let i = index" class="border-t">
+              <td class="px-4 py-3">{{ i + 1 }}</td>
+              <td class="px-4 py-3">{{ item.descricao }}</td>
+              <td class="px-4 py-3">{{ item.dente || '—' }}</td>
+              <td class="px-4 py-3">{{ item.quantidade }}</td>
+              <td class="px-4 py-3">R$ {{ (item.valorUnitario | number:'1.2-2') }}</td>
+              <td class="px-4 py-3 font-semibold">R$ {{ (item.valorTotal | number:'1.2-2') }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="border-t bg-slate-50">
+              <td colspan="5" class="px-4 py-3 text-right font-bold">Total:</td>
+              <td class="px-4 py-3 font-bold text-blue-700">R$ {{ (o.valorTotal | number:'1.2-2') }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Observações -->
+      <div *ngIf="o.observacoes" class="mb-6 rounded-xl border p-4">
+        <p class="text-xs text-gray-500 mb-1">Observações</p>
+        <p class="text-sm">{{ o.observacoes }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-wrap gap-3 justify-end">
+        <a routerLink="/orcamento/lista"
+          class="rounded-xl border border-gray-300 px-5 py-2 text-sm">Voltar</a>
+
+        <ng-container *ngIf="o.status === 'Pendente'">
+          <button
+            class="rounded-xl bg-red-600 px-5 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50"
+            [disabled]="processing() !== null" (click)="recusar()">
+            {{ processing() === 'recusar' ? 'Processando…' : 'Recusar' }}
+          </button>
+          <button
+            class="rounded-xl bg-green-600 px-5 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50"
+            [disabled]="processing() !== null" (click)="aprovar()">
+            {{ processing() === 'aprovar' ? 'Processando…' : 'Aprovar' }}
+          </button>
+        </ng-container>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,200 @@
+<div>
+  <app-page-breadcrumb pageTitle="Financeiro" />
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="rounded-2xl border border-green-200 bg-green-50 p-5">
+      <p class="text-xs font-medium text-green-600 mb-1">Receitas ({{ mesFiltro() }})</p>
+      <p class="text-2xl font-bold text-green-700">R$ {{ (totalReceitas() | number:'1.2-2') }}</p>
+    </div>
+    <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+      <p class="text-xs font-medium text-red-600 mb-1">Despesas ({{ mesFiltro() }})</p>
+      <p class="text-2xl font-bold text-red-700">R$ {{ (totalDespesas() | number:'1.2-2') }}</p>
+    </div>
+    <div class="rounded-2xl border p-5" [ngClass]="saldo() >= 0 ? 'border-blue-200 bg-blue-50' : 'border-orange-200 bg-orange-50'">
+      <p class="text-xs font-medium mb-1" [ngClass]="saldo() >= 0 ? 'text-blue-600' : 'text-orange-600'">Saldo</p>
+      <p class="text-2xl font-bold" [ngClass]="saldo() >= 0 ? 'text-blue-700' : 'text-orange-700'">
+        R$ {{ (saldo() | number:'1.2-2') }}
+      </p>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+
+    <!-- Tabs + Filters -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 justify-between mb-4">
+      <div class="flex gap-2">
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="aba() === 'receitas' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 hover:bg-gray-50'"
+          (click)="setAba('receitas')">Receitas</button>
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="aba() === 'despesas' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 hover:bg-gray-50'"
+          (click)="setAba('despesas')">Despesas</button>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <input type="month" [value]="mesFiltro()" (change)="mesFiltro.set($any($event.target).value); page.set(1)"
+          class="border rounded-xl px-3 py-2 text-sm" />
+        <input type="text" placeholder="Buscar…"
+          class="border rounded-xl px-3 py-2 text-sm w-44"
+          [value]="search()" (input)="search.set($any($event.target).value); page.set(1)" />
+        <button class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+          (click)="openModal(aba() === 'receitas' ? 'receita' : 'despesa')">
+          + {{ aba() === 'receitas' ? 'Nova Receita' : 'Nova Despesa' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading / Error -->
+    <p *ngIf="loading()" class="text-center text-gray-500 py-8">Carregando…</p>
+    <p *ngIf="!loading() && error()" class="text-center text-red-600 py-8">{{ error() }}</p>
+
+    <!-- Table Receitas -->
+    <div *ngIf="!loading() && !error() && aba() === 'receitas'" class="overflow-auto rounded-xl border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50">
+          <tr class="text-left">
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Paciente</th>
+            <th class="px-4 py-3">Tipo</th>
+            <th class="px-4 py-3">Valor</th>
+            <th class="px-4 py-3">Data</th>
+            <th class="px-4 py-3">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="paged().length === 0">
+            <td colspan="6" class="px-4 py-6 text-center text-gray-500">Nenhuma receita no período.</td>
+          </tr>
+          <tr *ngFor="let item of paged()" class="border-t hover:bg-slate-50">
+            <ng-container *ngIf="isReceita(item)">
+              <td class="px-4 py-3">{{ item.id }}</td>
+              <td class="px-4 py-3">{{ item.paciente?.nome || item.pacienteId }}</td>
+              <td class="px-4 py-3">{{ item.tipoPagamento }}</td>
+              <td class="px-4 py-3 font-semibold text-green-700">R$ {{ (item.valor | number:'1.2-2') }}</td>
+              <td class="px-4 py-3">{{ item.data | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3">
+                <span class="rounded-full px-2 py-0.5 text-xs font-semibold" [ngClass]="statusClass(item.status)">{{ item.status }}</span>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Despesas -->
+    <div *ngIf="!loading() && !error() && aba() === 'despesas'" class="overflow-auto rounded-xl border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50">
+          <tr class="text-left">
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Descrição</th>
+            <th class="px-4 py-3">Categoria</th>
+            <th class="px-4 py-3">Valor</th>
+            <th class="px-4 py-3">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="paged().length === 0">
+            <td colspan="5" class="px-4 py-6 text-center text-gray-500">Nenhuma despesa no período.</td>
+          </tr>
+          <tr *ngFor="let item of paged()" class="border-t hover:bg-slate-50">
+            <ng-container *ngIf="!isReceita(item)">
+              <td class="px-4 py-3">{{ item.id }}</td>
+              <td class="px-4 py-3">{{ item.descricao }}</td>
+              <td class="px-4 py-3">{{ item.categoria }}</td>
+              <td class="px-4 py-3 font-semibold text-red-700">R$ {{ (item.valor | number:'1.2-2') }}</td>
+              <td class="px-4 py-3">{{ item.data | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+      <span>{{ listaAtiva().length }} registro(s)</span>
+      <div class="flex items-center gap-2">
+        <button class="px-3 py-1 border rounded-lg" (click)="page.set(page() - 1)" [disabled]="page() <= 1">«</button>
+        <span>{{ page() }} / {{ totalPages() }}</span>
+        <button class="px-3 py-1 border rounded-lg" (click)="page.set(page() + 1)" [disabled]="page() >= totalPages()">»</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Nova Receita / Despesa -->
+<div *ngIf="isModalOpen()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-800">
+        {{ modalTipo() === 'receita' ? 'Nova Receita' : 'Nova Despesa' }}
+      </h3>
+      <button class="p-1 rounded hover:bg-gray-100" (click)="isModalOpen.set(false)">&#10005;</button>
+    </div>
+
+    <!-- Receita form -->
+    <div *ngIf="modalTipo() === 'receita'" class="flex flex-col gap-3">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Tipo de Pagamento</label>
+        <select [(ngModel)]="formReceita.tipoPagamento"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm">
+          <option value="Particular">Particular</option>
+          <option value="Convênio">Convênio</option>
+          <option value="Comissão">Comissão</option>
+        </select>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Valor (R$)</label>
+        <input type="number" [(ngModel)]="formReceita.valor" min="0" step="0.01"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Data</label>
+        <input type="date" [(ngModel)]="formReceita.data"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Status</label>
+        <select [(ngModel)]="formReceita.status"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm">
+          <option value="Pendente">Pendente</option>
+          <option value="Pago">Pago</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Despesa form -->
+    <div *ngIf="modalTipo() === 'despesa'" class="flex flex-col gap-3">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Descrição *</label>
+        <input type="text" [(ngModel)]="formDespesa.descricao" placeholder="Ex: Aluguel"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Categoria</label>
+        <input type="text" [(ngModel)]="formDespesa.categoria" placeholder="Ex: Infraestrutura"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Valor (R$)</label>
+        <input type="number" [(ngModel)]="formDespesa.valor" min="0" step="0.01"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Data</label>
+        <input type="date" [(ngModel)]="formDespesa.data"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm" />
+      </div>
+    </div>
+
+    <div class="mt-5 flex justify-end gap-3">
+      <button class="rounded-lg border border-gray-300 px-4 py-2 text-sm" (click)="isModalOpen.set(false)">Cancelar</button>
+      <button class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+        [disabled]="saving()" (click)="handleSave()">
+        {{ saving() ? 'Salvando…' : 'Salvar' }}
+      </button>
+    </div>
+  </div>
+</div>

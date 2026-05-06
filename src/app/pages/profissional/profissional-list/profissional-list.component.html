@@ -8,12 +8,20 @@
       <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
         <h2 class="text-xl font-extrabold">Profissionais</h2>
         <div class="flex flex-wrap gap-2">
-          <input type="text" placeholder="Buscar por nome, e-mail, CRO..."
-                 class="w-72 border rounded-xl px-3 py-2"
-                 [value]="search()" (input)="search.set($any($event.target).value)" />
+          <input type="text" placeholder="Buscar por nome ou e-mail…"
+                 class="w-64 border rounded-xl px-3 py-2 text-sm"
+                 [value]="search()" (input)="onSearch($any($event.target).value)" />
+          <button (click)="exportExcel()"
+                  class="px-3 py-2 rounded-xl border text-sm font-semibold hover:bg-gray-50">
+            Excel
+          </button>
+          <button (click)="exportPDF()"
+                  class="px-3 py-2 rounded-xl border text-sm font-semibold hover:bg-gray-50">
+            PDF
+          </button>
           <a routerLink="/profissional/novo"
-             class="px-3 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700">
-            + Novo Profissional
+             class="px-3 py-2 rounded-xl font-semibold bg-emerald-600 text-white text-sm hover:bg-emerald-700">
+            + Novo
           </a>
         </div>
       </div>
@@ -26,8 +34,8 @@
               <th class="px-3 py-2">ID</th>
               <th class="px-3 py-2">Nome</th>
               <th class="px-3 py-2">E-mail</th>
-              <th class="px-3 py-2">CRO</th>
-              <th class="px-3 py-2">Status</th>
+              <th class="px-3 py-2">Nascimento</th>
+              <th class="px-3 py-2">Sexo</th>
               <th class="px-3 py-2 text-right">Ações</th>
             </tr>
           </thead>
@@ -41,34 +49,63 @@
             <tr *ngIf="!loading() && !error() && filtered().length === 0">
               <td class="px-3 py-4 text-center text-gray-500" colspan="6">Nenhum profissional encontrado.</td>
             </tr>
-            <tr *ngFor="let p of filtered()" class="border-t hover:bg-gray-50">
-              <td class="px-3 py-2">{{ p.id }}</td>
+            <tr *ngFor="let p of paged()" class="border-t hover:bg-gray-50">
+              <td class="px-3 py-2 text-gray-500">{{ p.id }}</td>
               <td class="px-3 py-2 font-semibold">{{ p.nome }}</td>
               <td class="px-3 py-2">{{ p.email }}</td>
-              <td class="px-3 py-2">{{ p.cro }}</td>
-              <td class="px-3 py-2">
-                <span [class]="p.status === 'ativo'
-                  ? 'px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-700'
-                  : 'px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600'">
-                  {{ p.status ?? 'ativo' }}
-                </span>
-              </td>
+              <td class="px-3 py-2">{{ p.dataNascimento | date:'dd/MM/yyyy' }}</td>
+              <td class="px-3 py-2">{{ p.sexo }}</td>
               <td class="px-3 py-2">
                 <div class="flex items-center gap-2 justify-end">
-                  <a class="px-2 py-1 rounded-lg border hover:bg-gray-50"
+                  <a class="px-2 py-1 rounded-lg border text-xs hover:bg-gray-50"
                      [routerLink]="['/profissional/detalhe', p.id]">
-                    Detalhe
+                    Ver / Editar
                   </a>
-                  <a class="px-2 py-1 rounded-lg border hover:bg-gray-50"
-                     [routerLink]="['/profissional/detalhe', p.id]">
-                    Editar
-                  </a>
+                  <button class="px-2 py-1 rounded-lg border text-xs text-red-600 hover:bg-red-50"
+                          (click)="confirmDelete(p)">
+                    Excluir
+                  </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- Paginação -->
+      <div *ngIf="!loading() && totalPages() > 1"
+           class="flex items-center gap-2 justify-end text-sm">
+        <span class="text-gray-500">
+          {{ (page() - 1) * pageSize() + 1 }}–{{ page() * pageSize() > filtered().length ? filtered().length : page() * pageSize() }} de {{ filtered().length }}
+        </span>
+        <button (click)="setPage(page() - 1)" [disabled]="page() === 1"
+                class="px-3 py-1 rounded-lg border disabled:opacity-40">‹</button>
+        <span>{{ page() }} / {{ totalPages() }}</span>
+        <button (click)="setPage(page() + 1)" [disabled]="page() === totalPages()"
+                class="px-3 py-1 rounded-lg border disabled:opacity-40">›</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmação de exclusão -->
+<div *ngIf="deleteRow()"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <h3 class="text-lg font-bold mb-2">Confirmar exclusão</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      Deseja excluir <strong>{{ deleteRow()?.nome }}</strong>? Esta ação não pode ser desfeita.
+    </p>
+    <div class="flex gap-3 justify-end">
+      <button (click)="cancelDelete()"
+              class="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="doDelete()" [disabled]="deleting()"
+              class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-50">
+        {{ deleting() ? 'Excluindo…' : 'Excluir' }}
+      </button>
     </div>
   </div>
 </div>

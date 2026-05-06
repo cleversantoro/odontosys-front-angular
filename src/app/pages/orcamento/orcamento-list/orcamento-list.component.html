@@ -1,0 +1,102 @@
+<div>
+  <app-page-breadcrumb pageTitle="Orçamentos" />
+
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4">
+      <input type="text" placeholder="Buscar por paciente ou status…"
+        class="w-72 border rounded-xl px-3 py-2 text-sm"
+        [value]="search()" (input)="search.set($any($event.target).value); page.set(1)" />
+
+      <div class="flex gap-2">
+        <select class="border rounded-xl px-3 py-2 text-sm"
+          [value]="pageSize()" (change)="pageSize.set(+$any($event.target).value); page.set(1)">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <a routerLink="/orcamento/novo"
+          class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
+          + Novo Orçamento
+        </a>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-auto rounded-xl border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50">
+          <tr class="text-left">
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Paciente</th>
+            <th class="px-4 py-3">Profissional</th>
+            <th class="px-4 py-3">Valor Total</th>
+            <th class="px-4 py-3">Validade</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading()">
+            <td colspan="7" class="px-4 py-6 text-center text-gray-500">Carregando…</td>
+          </tr>
+          <tr *ngIf="!loading() && error()">
+            <td colspan="7" class="px-4 py-6 text-center text-red-600">{{ error() }}</td>
+          </tr>
+          <tr *ngIf="!loading() && !error() && paged().length === 0">
+            <td colspan="7" class="px-4 py-6 text-center text-gray-500">Nenhum orçamento encontrado.</td>
+          </tr>
+          <tr *ngFor="let o of paged()" class="border-t hover:bg-slate-50">
+            <td class="px-4 py-3">{{ o.id }}</td>
+            <td class="px-4 py-3 font-semibold">{{ o.Paciente?.nome || o.pacienteId }}</td>
+            <td class="px-4 py-3">{{ o.Profissional?.nome || o.profissionalId }}</td>
+            <td class="px-4 py-3">R$ {{ (o.valorTotal | number:'1.2-2') }}</td>
+            <td class="px-4 py-3">{{ o.validade || '—' }}</td>
+            <td class="px-4 py-3">
+              <span class="rounded-full px-2 py-0.5 text-xs font-semibold" [ngClass]="statusClass(o.status)">
+                {{ o.status }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex justify-end gap-2">
+                <a [routerLink]="['/orcamento/detalhe', o.id]"
+                  class="px-3 py-1 rounded-lg border text-sm hover:bg-gray-50">Detalhes</a>
+                <button class="px-3 py-1 rounded-lg border text-sm text-red-600 hover:bg-red-50"
+                  (click)="confirmDelete(o)">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+      <span>{{ filtered().length }} registro(s)</span>
+      <div class="flex items-center gap-2">
+        <button class="px-3 py-1 border rounded-lg" (click)="page.set(page() - 1)" [disabled]="page() <= 1">«</button>
+        <span>{{ page() }} / {{ totalPages() }}</span>
+        <button class="px-3 py-1 border rounded-lg" (click)="page.set(page() + 1)" [disabled]="page() >= totalPages()">»</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Excluir -->
+<div *ngIf="isDeleteOpen()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-2">Confirmar Exclusão</h3>
+    <p class="text-sm text-gray-600 mb-5">
+      Excluir o orçamento de <strong>{{ deleteTarget()?.Paciente?.nome || deleteTarget()?.pacienteId }}</strong>?
+    </p>
+    <div class="flex justify-end gap-3">
+      <button class="rounded-lg border px-4 py-2 text-sm" (click)="isDeleteOpen.set(false)">Cancelar</button>
+      <button class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50"
+        [disabled]="deleting()" (click)="doDelete()">
+        {{ deleting() ? 'Excluindo…' : 'Excluir' }}
+      </button>
+    </div>
+  </div>
+</div>

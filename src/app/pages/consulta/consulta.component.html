@@ -9,13 +9,14 @@
             <!-- Filtros + Ações -->
             <div class="toolbar">
                 <div class="filters">
-                    <input class="input" type="text" placeholder="Paciente" />
-                    <!-- onFiltroPaciente(($event.target as HTMLInputElement).value) -->
+                    <input class="input" type="text" placeholder="Paciente"
+                           (input)="onFiltroPaciente($any($event.target).value)" />
 
-                    <input class="input" type="text" placeholder="Profissional" />
-                    <!-- (input)="onFiltroProfissional(($event.target as HTMLInputElement).value)" -->
+                    <input class="input" type="text" placeholder="Profissional"
+                           (input)="onFiltroProfissional($any($event.target).value)" />
 
-                    <select class="select">
+                    <select class="select"
+                            (change)="onFiltroStatus($any($event.target).value)">
                         <option value="">Todos os status</option>
                         <option value="Agendado">Agendado</option>
                         <option value="Confirmado">Confirmado</option>
@@ -23,7 +24,6 @@
                         <option value="Cancelado">Cancelado</option>
                         <option value="Finalizada">Finalizada</option>
                     </select>
-                    <!-- (change)="onFiltroStatus(($event.target as HTMLSelectElement).value)" -->
                 </div>
 
                 <div class="actions">
@@ -131,4 +131,144 @@
         </div>
 
     </div>
+</div>
+
+<!-- ===== Modal Criar / Editar Consulta ===== -->
+<div *ngIf="isModalOpen()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl overflow-y-auto max-h-[90vh]">
+
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-800">
+        {{ selectedId() ? 'Editar Consulta' : 'Nova Consulta' }}
+      </h3>
+      <button class="p-2 rounded-lg hover:bg-gray-100" (click)="closeModal()">&#10005;</button>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+
+      <!-- Paciente -->
+      <div class="sm:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Paciente *</label>
+        <select [(ngModel)]="form.pacienteId"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option [ngValue]="null">-- Selecione o paciente --</option>
+          <option *ngFor="let p of pacientes" [ngValue]="p.id">{{ p.nome }}</option>
+        </select>
+      </div>
+
+      <!-- Profissional -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Profissional *</label>
+        <select [(ngModel)]="form.profissionalId"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option [ngValue]="null">-- Selecione o profissional --</option>
+          <option *ngFor="let pr of profissionais" [ngValue]="pr.id">{{ pr.nome }}</option>
+        </select>
+      </div>
+
+      <!-- Convênio -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Convênio</label>
+        <select [(ngModel)]="form.convenioId"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option [ngValue]="null">-- Nenhum --</option>
+          <option *ngFor="let c of convenios" [ngValue]="c.id">{{ c.nome }}</option>
+        </select>
+      </div>
+
+      <!-- Data / Hora -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Data e Hora *</label>
+        <input type="datetime-local" [(ngModel)]="form.dataHora"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Status</label>
+        <select [(ngModel)]="form.status"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option *ngFor="let s of statusOptions" [ngValue]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- Procedimentos -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Procedimentos</label>
+        <input type="text" [(ngModel)]="form.procedimentos" placeholder="Ex: Extração, Limpeza..."
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+
+      <!-- Valor Cobrado -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Valor Cobrado (R$)</label>
+        <input type="number" min="0" step="0.01" [(ngModel)]="form.valorCobrado"
+          class="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+
+      <!-- Anamnese -->
+      <div class="sm:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Anamnese</label>
+        <textarea [(ngModel)]="form.anamnese" rows="2" placeholder="Histórico relevante..."
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      </div>
+
+      <!-- Diagnóstico -->
+      <div class="sm:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Diagnóstico</label>
+        <textarea [(ngModel)]="form.diagnostico" rows="2" placeholder="Diagnóstico clínico..."
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      </div>
+
+      <!-- Prescrição -->
+      <div class="sm:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Prescrição</label>
+        <textarea [(ngModel)]="form.prescricao" rows="2" placeholder="Medicamentos / orientações..."
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      </div>
+
+      <!-- Observações -->
+      <div class="sm:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Observações</label>
+        <textarea [(ngModel)]="form.observacoes" rows="2" placeholder="Anotações adicionais..."
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      </div>
+
+    </div><!-- /grid -->
+
+    <div class="mt-5 flex flex-wrap items-center justify-end gap-3">
+      <button (click)="closeModal()" type="button"
+        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="handleSave()" type="button"
+        [disabled]="saving() || !form.pacienteId || !form.profissionalId || !form.dataHora"
+        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+        {{ saving() ? 'Salvando...' : (selectedId() ? 'Salvar Alterações' : 'Cadastrar Consulta') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== Modal Confirmar Exclusão ===== -->
+<div *ngIf="isDeleteModalOpen()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-2">Confirmar Exclusão</h3>
+    <p class="text-sm text-gray-600 mb-1">
+      Deseja excluir a consulta
+      <strong *ngIf="selectedConsulta()">#{{ selectedConsulta()!.id }} — {{ selectedConsulta()!.nome_paciente }}</strong>?
+    </p>
+    <p class="text-xs text-red-500 mb-5">Esta ação não pode ser desfeita.</p>
+    <div class="flex justify-end gap-3">
+      <button (click)="cancelDelete()" type="button"
+        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="confirmDelete()" type="button" [disabled]="deleting()"
+        class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50">
+        {{ deleting() ? 'Excluindo...' : 'Excluir' }}
+      </button>
+    </div>
+  </div>
 </div>

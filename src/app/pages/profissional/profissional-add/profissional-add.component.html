@@ -1,15 +1,78 @@
 <div>
-  <app-page-breadcrumb pageTitle="Cadastro de Profissionais" />
-  <div class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-    <div class="mx-auto w-full max-w-[630px] text-center">
-      <h3 class="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-        Profissionais
-      </h3>
+  <app-page-breadcrumb pageTitle="Cadastro de Profissional" />
 
-      <p class="text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-        Start putting content on grids or panels, you can also use different
-        combinations of grids.Please check out the dashboard and other pages
-      </p>
+  <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 xl:px-10 xl:py-10">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-xl font-extrabold">Novo Profissional</h2>
+      <a routerLink="/profissional/lista"
+         class="px-3 py-2 rounded-xl border text-sm hover:bg-gray-50">
+        ← Voltar
+      </a>
     </div>
+
+    <p class="text-sm text-gray-500 mb-6">
+      Campos com <span class="text-red-600 font-semibold">*</span> são obrigatórios.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+
+      <!-- Nome -->
+      <div class="sm:col-span-2">
+        <label class="font-semibold">Nome Completo <span class="text-red-600">*</span></label>
+        <input type="text" formControlName="nome"
+               class="mt-1 w-full border rounded-xl px-3 py-2"
+               placeholder="Ex.: Dra. Ana Souza">
+        <p class="text-sm text-red-600 mt-1" *ngIf="invalid('nome')">
+          Informe o nome completo (mínimo 3 caracteres).
+        </p>
+      </div>
+
+      <!-- E-mail -->
+      <div>
+        <label class="font-semibold">E-mail <span class="text-red-600">*</span></label>
+        <input type="email" formControlName="email"
+               class="mt-1 w-full border rounded-xl px-3 py-2"
+               placeholder="exemplo@email.com">
+        <p class="text-sm text-red-600 mt-1" *ngIf="invalid('email')">
+          Informe um e-mail válido.
+        </p>
+      </div>
+
+      <!-- Data de Nascimento -->
+      <div>
+        <label class="font-semibold">Data de Nascimento <span class="text-red-600">*</span></label>
+        <input type="date" formControlName="dataNascimento"
+               class="mt-1 w-full border rounded-xl px-3 py-2">
+        <p class="text-sm text-red-600 mt-1" *ngIf="invalid('dataNascimento')">
+          Informe a data de nascimento.
+        </p>
+      </div>
+
+      <!-- Sexo -->
+      <div>
+        <label class="font-semibold">Sexo <span class="text-red-600">*</span></label>
+        <select formControlName="sexo" class="mt-1 w-full border rounded-xl px-3 py-2">
+          <option value="">Selecione…</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Feminino">Feminino</option>
+        </select>
+        <p class="text-sm text-red-600 mt-1" *ngIf="invalid('sexo')">
+          Selecione o sexo.
+        </p>
+      </div>
+
+      <!-- Botões -->
+      <div class="sm:col-span-2 flex gap-3 justify-end pt-2">
+        <a routerLink="/profissional/lista"
+           class="px-5 py-2 rounded-xl border text-sm hover:bg-gray-50">
+          Cancelar
+        </a>
+        <button type="submit" [disabled]="loading()"
+                class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700 disabled:opacity-50">
+          {{ loading() ? 'Salvando…' : 'Cadastrar' }}
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>

@@ -5,7 +5,6 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
-import { environment } from '../../../../environments/environment';
 import { PacientesService } from '../../../core/services/paciente.service';
 
 
@@ -23,8 +22,6 @@ export class PacientesDetailComponent implements OnInit {
   pacienteId: number | null = null;
   isEditing = false;
   loadingPaciente = false;
-
-  private API_URL = `${environment.apiUrl}/api/pacientes`;
 
   constructor(
     private fb: FormBuilder,
@@ -269,7 +266,7 @@ export class PacientesDetailComponent implements OnInit {
   }
 
   // ---------- Submit ----------
-  async onSubmit() {
+  onSubmit() {
 
     this.submitted = true;
 
@@ -327,18 +324,21 @@ export class PacientesDetailComponent implements OnInit {
       }
     };
 
-    try {
-      if (this.isEditing && this.pacienteId) {
-        await this.http.put(`${this.API_URL}/${this.pacienteId}`, payload).toPromise();
-        this.showToast('✅ Paciente atualizado com sucesso!');
+    if (this.isEditing && this.pacienteId) {
+        this.pacientesService.update(this.pacienteId, payload as any).subscribe({
+          next: () => this.showToast('✅ Paciente atualizado com sucesso!'),
+          error: () => this.showToast('❌ Erro ao salvar. Tente novamente.')
+        });
       } else {
-        await this.http.post(this.API_URL, payload).toPromise();
-        this.showToast('✅ Paciente cadastrado com sucesso!');
+        this.pacientesService.create(payload as any).subscribe({
+          next: () => {
+            this.showToast('✅ Paciente cadastrado com sucesso!');
+            this.submitted = false;
+            this.router.navigate(['/paciente/lista']);
+          },
+          error: () => this.showToast('❌ Erro ao salvar. Tente novamente.')
+        });
       }
-      this.submitted = false;
-    } catch {
-      this.showToast('❌ Erro ao salvar. Tente novamente.');
-    }
   }
 
   onClear() {

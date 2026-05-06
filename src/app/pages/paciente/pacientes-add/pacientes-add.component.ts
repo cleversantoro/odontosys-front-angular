@@ -3,8 +3,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
-import { environment } from '../../../../environments/environment';
+import { PacientesService } from '../../../core/services/paciente.service';
 
 
 @Component({
@@ -18,9 +19,7 @@ export class PacientesAddComponent {
   toastMsg: string | null = null;
   ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 
-  private API_URL = `${environment.apiUrl}/api/pacientes`;
-
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private pacientesService: PacientesService, private router: Router) {
     this.form = this.fb.group({
       // Dados pessoais
       nome: ['', [Validators.required, Validators.minLength(3)]],
@@ -215,7 +214,7 @@ export class PacientesAddComponent {
   }
 
   // ---------- Submit ----------
-  async onSubmit() {
+  onSubmit() {
 
     this.submitted = true;
 
@@ -273,14 +272,16 @@ export class PacientesAddComponent {
       }
     };
 
-    try {
-      await this.http.post(this.API_URL, payload).toPromise();
-      this.showToast('✅ Paciente cadastrado com sucesso!');
-      this.submitted = false;
-      // this.form.reset({ alergia:'nao', cronica:'nao', medicacao:'nao', fumante:'nao', sangramento:'nao', diabetico:'nao', cardiaco:'nao', gravida:'nao' });
-    } catch {
-      this.showToast('❌ Erro ao salvar. Tente novamente.');
-    }
+    this.pacientesService.create(payload as any).subscribe({
+      next: () => {
+        this.showToast('✅ Paciente cadastrado com sucesso!');
+        this.submitted = false;
+        this.router.navigate(['/paciente/lista']);
+      },
+      error: () => {
+        this.showToast('❌ Erro ao salvar. Tente novamente.');
+      }
+    });
   }
 
   onClear() {

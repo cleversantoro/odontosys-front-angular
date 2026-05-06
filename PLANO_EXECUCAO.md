@@ -134,33 +134,33 @@
 > Criar os serviços que alimentarão as páginas.
 
 ### 5.1 Criar `ProfissionalService`
-- [ ] Criar `src/app/core/services/profissional.service.ts`
-- [ ] Implementar: `list()`, `getById(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`
-- [ ] Usar `environment.apiUrl + '/api/profissionais'`
+- [x] Criar `src/app/core/services/profissional.service.ts`
+- [x] Implementar: `list()`, `getById(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`
+- [x] Usar `environment.apiUrl + '/api/profissionais'`
 
 ### 5.2 Criar `AgendamentoService`
-- [ ] Criar `src/app/core/services/agendamento.service.ts`
-- [ ] Implementar: `list()`, `listByPeriodo(inicio, fim)`, `create(payload)`, `update(id, payload)`, `remove(id)`
-- [ ] Usar `environment.apiUrl + '/api/agendamentos'`
+- [x] Criar `src/app/core/services/agendamento.service.ts`
+- [x] Implementar: `list()`, `listByPeriodo(inicio, fim)`, `create(payload)`, `update(id, payload)`, `remove(id)`
+- [x] Usar `environment.apiUrl + '/api/agendamentos'`
 
 ### 5.3 Criar `ConvenioService`
-- [ ] Criar `src/app/core/services/convenio.service.ts`
-- [ ] Implementar: `list()`, `getById(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`
+- [x] Criar `src/app/core/services/convenio.service.ts`
+- [x] Implementar: `list()`, `getById(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`
 
 ### 5.4 Criar `OrcamentoService`
-- [ ] Criar `src/app/core/services/orcamento.service.ts`
-- [ ] Implementar: `list()`, `getByPaciente(pacienteId)`, `create(payload)`, `update(id, payload)`, `aprovar(id)`, `recusar(id)`
+- [x] Criar `src/app/core/services/orcamento.service.ts`
+- [x] Implementar: `list()`, `getByPaciente(pacienteId)`, `create(payload)`, `update(id, payload)`, `aprovar(id)`, `recusar(id)`
 
 ### 5.5 Criar `FinanceiroService`
-- [ ] Criar `src/app/core/services/financeiro.service.ts`
-- [ ] Implementar: `listReceitas()`, `listDespesas()`, `resumoMensal()`, `create(payload)`
+- [x] Criar `src/app/core/services/financeiro.service.ts`
+- [x] Implementar: `listReceitas()`, `listDespesas()`, `resumoMensal()`, `createPagamento(payload)`, `createDespesa(payload)`
 
 ### 5.6 Criar `DashboardService`
-- [ ] Criar `src/app/core/services/dashboard.service.ts`
-- [ ] Implementar: `getKPIs()` — consultas do dia, total pacientes, receita do mês, agendamentos pendentes
+- [x] Criar `src/app/core/services/dashboard.service.ts`
+- [x] Implementar: `getKPIs()` — consultas do dia, total pacientes, receita do mês, agendamentos pendentes
 
 ### 5.7 Completar `ConsultaService`
-- [ ] Adicionar métodos: `create(payload)`, `update(id, payload)`, `remove(id)`, `getById(id)`
+- [x] Adicionar métodos: `create(payload)`, `update(id, payload)`, `remove(id)`, `getById(id)`
 - **Arquivo:** `src/app/core/services/consulta.service.ts`
 
 ---
@@ -169,28 +169,28 @@
 > Completar as três páginas do módulo, atualmente todas vazias.
 
 ### 6.1 Implementar `ProfissionalListComponent`
-- [ ] Injetar `ProfissionalService`
-- [ ] Carregar lista com `ngOnInit`
-- [ ] Implementar busca/filtro por nome, CRO, especialidade
-- [ ] Implementar paginação (padrão igual ao de Pacientes)
-- [ ] Adicionar botões: Novo, Ver, Editar, Excluir
-- [ ] Implementar exportação PDF/Excel (padrão igual ao de Pacientes)
+- [x] Injetar `ProfissionalService`
+- [x] Carregar lista com `ngOnInit`
+- [x] Implementar busca/filtro por nome e e-mail
+- [x] Implementar paginação (padrão igual ao de Pacientes)
+- [x] Adicionar botões: Novo, Ver/Editar, Excluir
+- [x] Implementar exportação PDF/Excel
 - **Arquivo:** `src/app/pages/profissional/profissional-list/`
 
 ### 6.2 Implementar `ProfissionalAddComponent`
-- [ ] Criar formulário com campos: nome, email, CRO, especialidade, departamento, telefone, data nascimento, sexo, status
-- [ ] Validações de campos obrigatórios
-- [ ] Conectar ao `ProfissionalService.create()`
-- [ ] Feedback de sucesso/erro (toast)
-- [ ] Redirecionar para lista após salvar
+- [x] Criar formulário com campos: nome, email, data nascimento, sexo (campos suportados pela API)
+- [x] Validações de campos obrigatórios
+- [x] Conectar ao `ProfissionalService.create()`
+- [x] Feedback de sucesso/erro (toast)
+- [x] Redirecionar para lista após salvar
 - **Arquivo:** `src/app/pages/profissional/profissional-add/`
 
 ### 6.3 Implementar `ProfissionalDetailComponent`
-- [ ] Ler parâmetro `:id` da rota via `ActivatedRoute`
-- [ ] Carregar dados do profissional via `ProfissionalService.getById(id)`
-- [ ] Exibir formulário pré-preenchido para edição
-- [ ] Conectar ao `ProfissionalService.update(id, payload)`
-- [ ] Botão de exclusão com confirmação
+- [x] Ler parâmetro `:id` da rota via `ActivatedRoute`
+- [x] Carregar dados do profissional via `ProfissionalService.getById(id)`
+- [x] Exibir formulário pré-preenchido para edição
+- [x] Conectar ao `ProfissionalService.update(id, payload)`
+- [x] Botão de exclusão com confirmação
 - **Arquivo:** `src/app/pages/profissional/profissional-detail/`
 
 ---
@@ -199,22 +199,22 @@
 > As páginas existem mas têm problemas funcionais.
 
 ### 7.1 Corrigir `PacientesAddComponent`
-- [ ] Substituir `HttpClient` direto por `PacientesService`
-- [ ] Remover `API_URL` hardcoded
-- [ ] Redirecionar para lista após cadastro bem-sucedido
-- [ ] Adicionar feedback visual (toast/spinner)
+- [x] Substituir `HttpClient` direto por `PacientesService`
+- [x] Remover `API_URL` hardcoded
+- [x] Redirecionar para lista após cadastro bem-sucedido
+- [x] Adicionar feedback visual (toast/spinner)
 - **Arquivo:** `src/app/pages/paciente/pacientes-add/`
 
 ### 7.2 Corrigir `PacientesDetailComponent`
-- [ ] Ler parâmetro `:id` da rota via `ActivatedRoute`
-- [ ] Carregar dados via `PacientesService.getById(id)` e pré-preencher formulário
-- [ ] Substituir `HttpClient` direto por `PacientesService`
-- [ ] Conectar botão salvar ao `PacientesService.update(id, payload)`
-- [ ] Remover `API_URL` hardcoded
+- [x] Ler parâmetro `:id` da rota via `ActivatedRoute`
+- [x] Carregar dados via `PacientesService.getById(id)` e pré-preencher formulário
+- [x] Substituir `HttpClient` direto por `PacientesService`
+- [x] Conectar botão salvar ao `PacientesService.update(id, payload)`
+- [x] Remover `API_URL` hardcoded
 - **Arquivo:** `src/app/pages/paciente/pacientes-detail/`
 
 ### 7.3 Corrigir `PacientesListComponent`
-- [ ] Verificar e corrigir link "Ver detalhe" para navegar com ID: `[routerLink]="['/paciente/detalhe', row.id]"`
+- [x] Verificar e corrigir link "Ver detalhe" para navegar com ID: `[routerLink]="['/paciente/detalhe', row.id]"`
 - **Arquivo:** `src/app/pages/paciente/pacientes-list/`
 
 ---
@@ -223,21 +223,21 @@
 > Integrar o FullCalendar com a API de agendamentos.
 
 ### 8.1 Integrar `CalenderComponent` com `AgendamentoService`
-- [ ] Injetar `AgendamentoService`
-- [ ] Substituir lista de eventos hardcoded por chamada à API
-- [ ] Mapear `Agendamento` para o formato `EventInput` do FullCalendar
-- [ ] Implementar criação de agendamento ao clicar em data vazia (chamar `AgendamentoService.create()`)
-- [ ] Implementar edição ao clicar em evento existente
-- [ ] Implementar exclusão de agendamento
-- [ ] Exibir nome do paciente e profissional no evento do calendário
+- [x] Injetar `AgendamentoService`
+- [x] Substituir lista de eventos hardcoded por chamada à API
+- [x] Mapear `Agendamento` para o formato `EventInput` do FullCalendar
+- [x] Implementar criação de agendamento ao clicar em data vazia (chamar `AgendamentoService.create()`)
+- [x] Implementar edição ao clicar em evento existente
+- [x] Implementar exclusão de agendamento
+- [x] Exibir nome do paciente e profissional no evento do calendário
 - **Arquivo:** `src/app/pages/calender/calender.component.ts`
 
 ### 8.2 Melhorar modal de agendamento
-- [ ] Adicionar seletor de Paciente (autocomplete via `PacientesService`)
-- [ ] Adicionar seletor de Profissional (via `ProfissionalService`)
-- [ ] Adicionar seletor de Convênio (via `ConvenioService`)
-- [ ] Campo de tipo de procedimento
-- [ ] Campo de observações
+- [x] Adicionar seletor de Paciente (autocomplete via `PacientesService`)
+- [x] Adicionar seletor de Profissional (via `ProfissionalService`)
+- [x] Adicionar seletor de Convênio (via `ConvenioService`)
+- [x] Campo de tipo de procedimento
+- [x] Campo de observações
 
 ---
 
@@ -245,53 +245,53 @@
 > A página existe mas tem bug e funcionalidades incompletas.
 
 ### 9.1 Corrigir bug de ordenação no `ConsultaComponent`
-- [ ] Corrigir o callback de `Array.sort` em `filtradas` — deve retornar resultado de comparação, não timestamp
+- [x] Corrigir o callback de `Array.sort` em `filtradas` — deve retornar resultado de comparação, não timestamp
 - **Arquivo:** `src/app/pages/consulta/consulta.component.ts`
 
 ### 9.2 Adicionar CRUD de Consultas
-- [ ] Botão "Nova Consulta" abrindo modal/formulário
-- [ ] Conectar ao `ConsultaService.create()`
-- [ ] Botão editar consulta existente
-- [ ] Conectar ao `ConsultaService.update()`
-- [ ] Botão excluir com confirmação
+- [x] Botão "Nova Consulta" abrindo modal/formulário
+- [x] Conectar ao `ConsultaService.create()`
+- [x] Botão editar consulta existente
+- [x] Conectar ao `ConsultaService.update()`
+- [x] Botão excluir com confirmação
 
 ---
 
 ## FASE 10 — Novos Módulos de Negócio
 
 ### 10.1 Criar módulo Convênios
-- [ ] Criar `src/app/pages/convenios/` com: `convenios-list/`, `convenios-add/`, `convenios-detail/`
-- [ ] Adicionar rotas no `app.routes.ts`
-- [ ] Adicionar item no menu lateral
+- [x] Criar `src/app/pages/convenios/` com: `convenios-list/`, `convenios-add/`, `convenios-detail/`
+- [x] Adicionar rotas no `app.routes.ts`
+- [x] Adicionar item no menu lateral
 
 ### 10.2 Criar módulo Orçamento / Plano de Tratamento
-- [ ] Criar `src/app/pages/orcamento/` com: `orcamento-list/`, `orcamento-add/`, `orcamento-detail/`
-- [ ] Formulário com itens (procedimentos, dentes, valores)
-- [ ] Fluxo de aprovação (pendente → aprovado/recusado)
-- [ ] Adicionar rotas e menu
+- [x] Criar `src/app/pages/orcamento/` com: `orcamento-list/`, `orcamento-add/`, `orcamento-detail/`
+- [x] Formulário com itens (procedimentos, dentes, valores)
+- [x] Fluxo de aprovação (pendente → aprovado/recusado)
+- [x] Adicionar rotas e menu
 
 ### 10.3 Criar módulo Financeiro
-- [ ] Criar `src/app/pages/financeiro/` com: `financeiro-list/`, `financeiro-add/`
-- [ ] Separar receitas e despesas
+- [x] Criar `src/app/pages/financeiro/` com: `financeiro-list/`, `financeiro-add/`
+- [x] Separar receitas e despesas
 - [ ] Gráfico de fluxo de caixa mensal
-- [ ] Adicionar rotas e menu
+- [x] Adicionar rotas e menu
 
 ### 10.4 Criar módulo Usuários e Permissões
-- [ ] Criar `src/app/pages/usuarios/` com: `usuarios-list/`, `usuarios-add/`, `usuarios-detail/`
-- [ ] Gestão de perfis (admin, dentista, recepcionista)
-- [ ] Ativar/inativar usuário
-- [ ] Adicionar rotas e menu (visível apenas para admin)
+- [x] Criar `src/app/pages/usuarios/` com: `usuarios-list/`, `usuarios-add/`, `usuarios-detail/`
+- [x] Gestão de perfis (admin, dentista, recepcionista)
+- [x] Ativar/inativar usuário
+- [x] Adicionar rotas e menu (visível apenas para admin)
 
 ---
 
 ## FASE 11 — Dashboard Real
 
 ### 11.1 Implementar KPIs reais no Dashboard
-- [ ] Conectar `EcommerceComponent` ao `DashboardService`
-- [ ] Exibir: consultas do dia, agendamentos pendentes, novos pacientes do mês
-- [ ] Exibir: receita do mês vs. mês anterior
-- [ ] Gráfico de consultas por semana
-- [ ] Gráfico de procedimentos mais realizados
+- [x] Conectar `EcommerceComponent` ao `DashboardService`
+- [x] Exibir: consultas do dia, agendamentos pendentes, novos pacientes do mês
+- [x] Exibir: receita do mês vs. mês anterior
+- [x] Gráfico de consultas por semana
+- [x] Gráfico de procedimentos mais realizados
 - **Arquivo:** `src/app/pages/dashboard/ecommerce/`
 
 ---
@@ -299,12 +299,12 @@
 ## FASE 12 — Relatórios e Exportação
 
 ### 12.1 Criar módulo Relatórios
-- [ ] Criar `src/app/pages/relatorios/relatorios.component.ts`
-- [ ] Relatório de pacientes (com filtros por período, convênio)
-- [ ] Relatório de consultas (por profissional, período, status)
-- [ ] Relatório financeiro (receitas, despesas, saldo)
-- [ ] Exportação em PDF e Excel
-- [ ] Adicionar rota e menu
+- [x] Criar `src/app/pages/relatorios/relatorios.component.ts`
+- [x] Relatório de pacientes (com filtros por período, convênio)
+- [x] Relatório de consultas (por profissional, período, status)
+- [x] Relatório financeiro (receitas, despesas, saldo)
+- [x] Exportação em PDF e Excel
+- [x] Adicionar rota e menu
 
 ---
 
